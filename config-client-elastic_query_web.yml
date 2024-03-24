@@ -1,0 +1,49 @@
+server:
+  port: 8184
+  servlet:
+    context-path: /elastic-query-web-client
+
+elastic-query-web-client:
+  webclient:
+    connect-timeout-ms: 10000
+    read-timeout-ms: 10000
+    write-timeout-ms: 10000
+    max-in-memory-size: 10485760 # 10MB
+    content-type: 'application/vnd.api.v1+json'
+    accept-type: 'application/vnd.api.v1+json'
+    base-url: 'http://gateway-service/elastic-query-service/documents'
+  query-by-text:
+    method: POST
+    uri: "/get-document-by-text"
+    accept: ${elastic-query-web-client.webclient.accept-type}
+
+spring:
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+  thymeleaf:
+    cache: false
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: 'elastic-query-web-client'
+            client-secret: '{cipher}76639d4d37c1a438b7c8054aabb165b3a510b4d2a7f2c70d647db63b2ed5eb3eb336f5fb719cd0f66be403c16a03e7f84f0d9b594d76e2cde7973c152796372f'
+            authorization-grant-type: authorization_code
+            redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+            scope: openid
+        provider:
+          keycloak:
+            issuerUri: http://localhost:9091/auth/realms/microservices-realm
+
+
+security:
+  logout-success-url: http://localhost:8184/elastic-query-web-client
+  default-client-registration-id: keycloak
+
+user-config:
+  username: test
+  password: '{cipher}6ddfd93f21db809d1d95e7fea4406d11087ea67c7fe879c768741af77b214e68'
+  roles: USER
